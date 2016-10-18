@@ -554,6 +554,13 @@ module.exports = function(Chart) {
 				me.scale.draw();
 			}
 
+			// Clip out the chart area so that anything outside does not draw. This is necessary for zoom and pan to function
+			var context = this.chart.ctx;
+			context.save();
+			context.beginPath();
+			context.rect(this.chartArea.left, this.chartArea.top, this.chartArea.right - this.chartArea.left, this.chartArea.bottom - this.chartArea.top);
+			context.clip();
+
 			Chart.plugins.notify('beforeDatasetsDraw', [me, easingDecimal]);
 
 			// Draw each dataset via its respective controller (reversed to support proper line stacking)
@@ -562,6 +569,9 @@ module.exports = function(Chart) {
 					me.getDatasetMeta(datasetIndex).controller.draw(ease);
 				}
 			}, me, true);
+
+			// Restore from the clipping operation
+			context.restore();
 
 			Chart.plugins.notify('afterDatasetsDraw', [me, easingDecimal]);
 
