@@ -297,10 +297,20 @@ module.exports = function(Chart) {
 				meta.dataset.transition(easingDecimal).draw();
 			}
 
+			// Restore from the clipping operation started in Chart.Controller
+			var context = me.chart.chart.ctx;
+			context.restore();
+
 			// Draw the points
 			for (i=0, ilen=points.length; i<ilen; ++i) {
 				points[i].draw();
 			}
+
+			// Resume the clipping operation started in Chart.Controller
+			context.save();
+			context.beginPath();
+			context.rect(me.chart.chartArea.left, me.chart.chartArea.top, me.chart.chartArea.right - me.chart.chartArea.left, me.chart.chartArea.bottom - me.chart.chartArea.top);
+			context.clip();
 		},
 
 		setHoverStyle: function(point) {
